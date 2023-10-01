@@ -21,6 +21,10 @@ import com.example.demo2.service.ModifyResponseService;
 import com.example.demo2.service.ValidationService;
 import com.example.demo2.util.DateTimeUtil;
 
+import lombok.extern.slf4j.Slf4j;
+
+
+@Slf4j
 @RestController
 public class MyController {
     private final ValidationService validationService;
@@ -36,6 +40,8 @@ public class MyController {
 
     @PostMapping("/feedback")
     public ResponseEntity<Response> feedback(@Valid @RequestBody Request request, BindingResult bindingResult ){
+        log.info("request: {}",request);
+        
         Response response =  Response.builder()
         .uid(request.getUid())
         .operationUid(request.getOperationUid())
