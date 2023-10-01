@@ -16,6 +16,7 @@ import com.example.demo2.exception.ValidationFailedException;
 import com.example.demo2.model.Request;
 import com.example.demo2.model.Response;
 import com.example.demo2.service.ValidationService;
+import com.example.demo2.util.DateTimeUtil;
 
 @RestController
 public class MyController {
@@ -27,11 +28,10 @@ public class MyController {
 
     @PostMapping("/feedback")
     public ResponseEntity<Response> feedback(@Valid @RequestBody Request request, BindingResult bindingResult ){
-        SimpleDateFormat simpleDateFormat= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         Response response =  Response.builder()
         .uid(request.getUid())
         .operationUid(request.getOperationUid())
-        .systemTime(simpleDateFormat.format(new Date()))
+        .systemTime(DateTimeUtil.getSimpleDateTimeFormat().format(new Date()))
         .code("success")
         .errorCode("")
         .errorMessage("")
