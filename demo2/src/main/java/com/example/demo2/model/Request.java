@@ -30,4 +30,18 @@ public class Request {
     private int templateId;
     private int productCode;
     private int smsCode;
+
+    public String toString(){
+        return "{"+
+        "uid='"+uid+"\'"+
+        "operationUid'"+operationUid+"\'"+
+        "systemName'"+systemName+"\'"+
+        "systemTime'"+operationUid+"\'"+
+        "source'"+source+"\'"+
+        "communicationId'"+communicationId+"\'"+
+        "templateId'"+templateId+"\'"+
+        "productCode'"+productCode+"\'"+
+        "smsCode'"+smsCode+"\'"+
+        "}";
+    }
 }

@@ -1,10 +1,9 @@
 package com.example.demo2.controller;
-
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.validation.Valid;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -13,17 +12,26 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo2.exception.ValidationFailedException;
+import com.example.demo2.model.Codes;
+import com.example.demo2.model.ErrorCodes;
+import com.example.demo2.model.ErrorMessages;
 import com.example.demo2.model.Request;
 import com.example.demo2.model.Response;
+import com.example.demo2.service.ModifyResponseService;
 import com.example.demo2.service.ValidationService;
 import com.example.demo2.util.DateTimeUtil;
 
 @RestController
 public class MyController {
     private final ValidationService validationService;
+    private final ModifyResponseService modifyResponseService;
 
-    public MyController(ValidationService validationService){
+    public MyController(ValidationService validationService,
+    @Qualifier("ModifySystemTimeResponseService")
+    ModifyResponseService modifyResponseService    
+    ){
         this.validationService=validationService;
+        this.modifyResponseService=modifyResponseService;
     }
 
     @PostMapping("/feedback")
@@ -31,26 +39,26 @@ public class MyController {
         Response response =  Response.builder()
         .uid(request.getUid())
         .operationUid(request.getOperationUid())
-        .systemTime(DateTimeUtil.getSimpleDateTimeFormat().format(new Date()))
-        .code("success")
-        .errorCode("")
-        .errorMessage("")
+        .systemTime(DateTimeUtil.getCustomFormat().format(new Date()))
+        .code(Codes.SUCCESS)
+        .errorCode(ErrorCodes.EMPTY)
+        .errorMessage(ErrorMessages.EMPTY)
         .build();
 
         try {
             validationService.isValid(bindingResult);
         } catch (ValidationFailedException e) {
-            response.setCode("failed");
-            response.setErrorCode("ValidationException");
-            response.setErrorMessage("Ошибка валидации");
+            response.setCode(Codes.FAILED);
+            response.setErrorCode(ErrorCodes.VALIDATION_EXCEPTION);
+            response.setErrorMessage(ErrorMessages.VALIDATION);
             return new ResponseEntity<Response>(response,HttpStatus.BAD_REQUEST);
         }catch(Exception e){
-            response.setCode("failed");
-            response.setErrorCode("UnknownException");
-            response.setErrorMessage("Произошла непредвиденная ошибка");
+            response.setCode(Codes.FAILED);
+            response.setErrorCode(ErrorCodes.UNKNOWN_EXCEPTION);
+            response.setErrorMessage(ErrorMessages.UNKNOWN);
             return new ResponseEntity<Response>(response,HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
+        modifyResponseService.modify(response);
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 }
