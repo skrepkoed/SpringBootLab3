@@ -31,7 +31,7 @@ public class MyController {
     private final ModifyResponseService modifyResponseService;
 
     public MyController(ValidationService validationService,
-    @Qualifier("ModifySystemTimeResponseService")
+    @Qualifier("ModifyOperationUidResponseService")
     ModifyResponseService modifyResponseService    
     ){
         this.validationService=validationService;
@@ -41,7 +41,6 @@ public class MyController {
     @PostMapping("/feedback")
     public ResponseEntity<Response> feedback(@Valid @RequestBody Request request, BindingResult bindingResult ){
         log.info("request: {}",request);
-        
         Response response =  Response.builder()
         .uid(request.getUid())
         .operationUid(request.getOperationUid())
@@ -50,21 +49,24 @@ public class MyController {
         .errorCode(ErrorCodes.EMPTY)
         .errorMessage(ErrorMessages.EMPTY)
         .build();
-
+        log.info("response:{}", response);
         try {
             validationService.isValid(bindingResult);
         } catch (ValidationFailedException e) {
             response.setCode(Codes.FAILED);
             response.setErrorCode(ErrorCodes.VALIDATION_EXCEPTION);
             response.setErrorMessage(ErrorMessages.VALIDATION);
+            log.error("response:{}", response);
             return new ResponseEntity<Response>(response,HttpStatus.BAD_REQUEST);
         }catch(Exception e){
             response.setCode(Codes.FAILED);
             response.setErrorCode(ErrorCodes.UNKNOWN_EXCEPTION);
             response.setErrorMessage(ErrorMessages.UNKNOWN);
+            log.error("response:{}", response);
             return new ResponseEntity<Response>(response,HttpStatus.INTERNAL_SERVER_ERROR);
         }
         modifyResponseService.modify(response);
+        log.info("response:{}", response);
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 }

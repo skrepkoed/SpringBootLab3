@@ -20,7 +20,7 @@ public class Request {
     @NotBlank
     @Size(max = 32)
     private String operationUid;
-    private String systemName;
+    private Systems systemName;
     @NotBlank
     private String  systemTime;
     private String source;
@@ -43,5 +43,8 @@ public class Request {
         "productCode'"+productCode+"\'"+
         "smsCode'"+smsCode+"\'"+
         "}";
+    }
+    public void setSystemName(Systems systems){
+        this.systemName=systems;
     }
 }
